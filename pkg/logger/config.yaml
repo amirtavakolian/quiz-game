@@ -1,0 +1,43 @@
+development-mode:
+  level: debug
+  development: true
+  encoding: console
+  encoderConfig:
+    messageKey: msg
+    levelKey: level
+    timeKey: ts
+    nameKey: logger
+    callerKey: caller
+    functionKey: ""
+    stacktraceKey: stacktrace
+    encodeLevel: capitalColor
+    encodeTime: iso8601
+    encodeDuration: string
+    encodeCaller: short
+  outputPaths:
+    - stdout
+    - ./logs/development.log
+  errorOutputPaths:
+    - stderr
+
+production-mode:
+  level: info
+  development: false
+  encoding: json
+  encoderConfig:
+    messageKey: msg
+    levelKey: level
+    timeKey: ts
+    nameKey: logger
+    callerKey: caller
+    functionKey: ""   # zapcore.OmitKey
+    stacktraceKey: stacktrace
+    encodeLevel: lowercase
+    encodeTime: iso8601
+    encodeDuration: seconds
+    encodeCaller: short
+  outputPaths:
+    - stdout
+    - ./logs/production.log
+  errorOutputPaths:
+    - stderr
