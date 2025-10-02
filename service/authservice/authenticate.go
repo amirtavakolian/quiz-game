@@ -1,4 +1,4 @@
-package userservice
+package authservice
 
 import (
 	"context"
@@ -9,14 +9,14 @@ import (
 	responser "github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/responser"
 	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/repository/otprepo"
 	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/repository/userrepo"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/validator"
+	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/validator/auth"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
 )
 
-type UserService struct {
-	UserValidator  validator.UserValidator
+type Authenticate struct {
+	UserValidator  auth.AuthValidator
 	UserRepository userrepo.UserRepositoryContract
 	Responser      responser.Response
 	Notifier       sms.SMSNotifier
@@ -24,8 +24,8 @@ type UserService struct {
 	Logger         logger.Logger
 }
 
-func NewUserService(userValidator validator.UserValidator, userRepo userrepo.UserRepositoryContract, response responser.Response, smsNotifier sms.SMSNotifier) UserService {
-	return UserService{
+func NewUserService(userValidator auth.AuthValidator, userRepo userrepo.UserRepositoryContract, response responser.Response, smsNotifier sms.SMSNotifier) Authenticate {
+	return Authenticate{
 		UserValidator:  userValidator,
 		UserRepository: userRepo,
 		Responser:      response,
@@ -35,7 +35,7 @@ func NewUserService(userValidator validator.UserValidator, userRepo userrepo.Use
 	}
 }
 
-func (s UserService) Register(userParam param.RegisterParam) responser.Response {
+func (s Authenticate) Authenticate(userParam param.RegisterParam) responser.Response {
 	if status, errorsList := s.UserValidator.RegisterUserValidate(userParam); !status {
 		return s.Responser.SetData(errorsList).SetStatusCode(http.StatusUnprocessableEntity).SetIsSuccess(false)
 	}
@@ -61,9 +61,9 @@ func (s UserService) Register(userParam param.RegisterParam) responser.Response 
 	}
 
 	ctx := context.Background()
-	ttl := 2 * time.Minute
+	ttl := 10 * time.Minute
 
-	err = s.OTPRepository.Set(ctx, userParam.PhoneNumber+"_otp_code", otpSixDigitCode, ttl)
+	err = s.OTPRepository.Set(ctx, OTPGeneratedCode+userParam.PhoneNumber, otpSixDigitCode, ttl)
 
 	if err != nil {
 		loggerSvc := s.Logger.Log()
