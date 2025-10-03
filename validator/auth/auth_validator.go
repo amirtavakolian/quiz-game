@@ -25,7 +25,7 @@ func (u AuthValidator) RegisterUserValidate(param param.RegisterParam) (bool, ma
 		status = false
 	}
 
-	if len(param.PhoneNumber) < 11 || param.PhoneNumber[:2] != "09" {
+	if len(param.PhoneNumber) != 11 || param.PhoneNumber[:2] != "09" {
 		errorsList["errors"] = append(errorsList["errors"], "phone number must be 11 numbers and start with 09")
 		status = false
 	}

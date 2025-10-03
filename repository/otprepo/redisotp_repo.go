@@ -22,3 +22,28 @@ func (redis RedisOTPRepo) Set(ctx context.Context, key string, value int, ttl ti
 	}
 	return nil
 }
+
+func (redis RedisOTPRepo) Get(ctx context.Context, key string) (string, error) {
+	val, err := redis.Client.Get(ctx, key).Result()
+	return val, err
+}
+
+func (redis RedisOTPRepo) TTL(ctx context.Context, key string) (time.Duration, error) {
+	val, err := redis.Client.TTL(ctx, key).Result()
+	return val, err
+}
+
+func (redis RedisOTPRepo) Incr(ctx context.Context, key string) (int64, error) {
+	val, err := redis.Client.Incr(ctx, key).Result()
+	return val, err
+}
+
+func (redis RedisOTPRepo) Expire(ctx context.Context, key string, ttl time.Duration) (bool, error) {
+	val, err := redis.Client.Expire(ctx, key, ttl).Result()
+	return val, err
+}
+
+func (redis RedisOTPRepo) Del(ctx context.Context, keys ...string) (int64, error) {
+	deleted, err := redis.Client.Del(ctx, keys...).Result()
+	return deleted, err
+}

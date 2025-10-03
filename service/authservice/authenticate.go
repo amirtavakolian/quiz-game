@@ -63,7 +63,7 @@ func (s Authenticate) Authenticate(userParam param.RegisterParam) responser.Resp
 	ctx := context.Background()
 	ttl := 10 * time.Minute
 
-	err = s.OTPRepository.Set(ctx, OTPGeneratedCode+userParam.PhoneNumber, otpSixDigitCode, ttl)
+	err = s.OTPRepository.Set(ctx, OTPGeneratedCodeKey+userParam.PhoneNumber, otpSixDigitCode, ttl)
 
 	if err != nil {
 		loggerSvc := s.Logger.Log()
@@ -79,7 +79,7 @@ func (s Authenticate) Authenticate(userParam param.RegisterParam) responser.Resp
 	if sendSMSError != nil {
 		logger := s.Logger.Log()
 		defer logger.Sync()
-		return s.Responser.SetIsSuccess(true).SetMessage(sendSMSError.Error()).SetStatusCode(http.StatusInternalServerError).SetData(map[string]int{"ttl": int(ttl.Seconds())}).Build()
+		return s.Responser.SetIsSuccess(false).SetMessage(sendSMSError.Error()).SetStatusCode(http.StatusInternalServerError).SetData(map[string]int{"ttl": int(ttl.Seconds())}).Build()
 
 	}
 
