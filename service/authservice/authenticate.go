@@ -2,14 +2,14 @@ package authservice
 
 import (
 	"context"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/param"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/helpers"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/logger"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/notifier/sms"
-	responser "github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/responser"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/repository/otprepo"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/repository/userrepo"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/validator/auth"
+		"github.com/amirtavakolian/quiz-game/param/authparams"
+"github.com/amirtavakolian/quiz-game/pkg/helpers"
+	"github.com/amirtavakolian/quiz-game/pkg/logger"
+	"github.com/amirtavakolian/quiz-game/pkg/notifier/sms"
+	responser "github.com/amirtavakolian/quiz-game/pkg/responser"
+	"github.com/amirtavakolian/quiz-game/repository/otprepo"
+	"github.com/amirtavakolian/quiz-game/repository/userrepo"
+	"github.com/amirtavakolian/quiz-game/validator/auth"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
@@ -35,7 +35,7 @@ func NewUserService(userValidator auth.AuthValidator, userRepo userrepo.UserRepo
 	}
 }
 
-func (s Authenticate) Authenticate(userParam param.RegisterParam) responser.Response {
+func (s Authenticate) Authenticate(userParam authparams.RegisterParam) responser.Response {
 	if status, errorsList := s.UserValidator.RegisterUserValidate(userParam); !status {
 		return s.Responser.SetData(errorsList).SetStatusCode(http.StatusUnprocessableEntity).SetIsSuccess(false)
 	}

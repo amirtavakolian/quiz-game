@@ -1,7 +1,7 @@
 package appservice
 
 import (
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/configloader"
+	"github.com/amirtavakolian/quiz-game/pkg/configloader"
 	"os"
 	"path/filepath"
 )

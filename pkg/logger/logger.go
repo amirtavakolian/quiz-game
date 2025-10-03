@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/configloader"
+	"github.com/amirtavakolian/quiz-game/pkg/configloader"
 	"go.uber.org/zap"
 	"os"
 	"path/filepath"

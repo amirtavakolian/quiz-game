@@ -1,6 +1,6 @@
 package userrepo
 
-import "github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/entity"
+import "github.com/amirtavakolian/quiz-game/entity"
 
 type InMemoryUserRepo struct {
 	Users map[string]entity.User

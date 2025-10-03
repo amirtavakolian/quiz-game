@@ -1,4 +1,4 @@
-package param
+package authparams
 
 type VerifyParam struct {
 	PhoneNumber string `json:"phone_number"`

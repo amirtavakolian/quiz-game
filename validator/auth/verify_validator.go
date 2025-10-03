@@ -1,6 +1,9 @@
 package auth
 
-import "github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/param"
+import (
+
+"github.com/amirtavakolian/quiz-game/param/authparams"
+)
 
 type VerifyValidator struct {
 }
@@ -9,7 +12,7 @@ func NewVerifyValidator() VerifyValidator {
 	return VerifyValidator{}
 }
 
-func (u VerifyValidator) Validate(param param.VerifyParam) (bool, map[string][]string) {
+func (u VerifyValidator) Validate(param authparams.VerifyParam) (bool, map[string][]string) {
 	errorsList := make(map[string][]string)
 	status := true
 

@@ -1,8 +1,8 @@
 package sms
 
 import (
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/configloader"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/service/appservice"
+	"github.com/amirtavakolian/quiz-game/pkg/configloader"
+	"github.com/amirtavakolian/quiz-game/service/appservice"
 )
 
 const (

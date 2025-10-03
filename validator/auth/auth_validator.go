@@ -1,7 +1,8 @@
 package auth
 
 import (
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/param"
+	"github.com/amirtavakolian/quiz-game/param/authparams"
+
 )
 
 type AuthValidator struct {
@@ -11,7 +12,7 @@ func NewUserValidator() AuthValidator {
 	return AuthValidator{}
 }
 
-func (u AuthValidator) RegisterUserValidate(param param.RegisterParam) (bool, map[string][]string) {
+func (u AuthValidator) RegisterUserValidate(param authparams.RegisterParam) (bool, map[string][]string) {
 	errorsList := make(map[string][]string)
 	status := true
 

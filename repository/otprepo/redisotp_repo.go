@@ -2,7 +2,7 @@ package otprepo
 
 import (
 	"context"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/repository"
+	"github.com/amirtavakolian/quiz-game/repository"
 	"github.com/redis/go-redis/v9"
 	"time"
 )

@@ -1,4 +1,4 @@
-package param
+package authparams
 
 type RegisterParam struct {
 	Name        string `json:"name"`

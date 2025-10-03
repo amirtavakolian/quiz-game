@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/param"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/jwt"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/logger"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/pkg/responser"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/repository/otprepo"
-	"github.com/amirtavakolian/adapter-and-repository-pattern-in-golang/validator/auth"
+		"github.com/amirtavakolian/quiz-game/param/authparams"
+"github.com/amirtavakolian/quiz-game/pkg/jwt"
+	"github.com/amirtavakolian/quiz-game/pkg/logger"
+	"github.com/amirtavakolian/quiz-game/pkg/responser"
+	"github.com/amirtavakolian/quiz-game/repository/otprepo"
+	"github.com/amirtavakolian/quiz-game/validator/auth"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"strconv"
@@ -45,7 +45,7 @@ func NewVerifyService(validator auth.VerifyValidator,
 	}
 }
 
-func (s Verify) Verify(verifyParam param.VerifyParam) responser.Response {
+func (s Verify) Verify(verifyParam authparams.VerifyParam) responser.Response {
 	ctx := context.Background()
 	status, validationErrors := s.Validator.Validate(verifyParam)
 
