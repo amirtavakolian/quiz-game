@@ -1,8 +1,9 @@
 package auth
 
 import (
-
-"github.com/amirtavakolian/quiz-game/param/authparams"
+	"github.com/amirtavakolian/quiz-game/param/authparams"
+	validation "github.com/go-ozzo/ozzo-validation"
+	"regexp"
 )
 
 type VerifyValidator struct {
@@ -12,19 +13,9 @@ func NewVerifyValidator() VerifyValidator {
 	return VerifyValidator{}
 }
 
-func (u VerifyValidator) Validate(param authparams.VerifyParam) (bool, map[string][]string) {
-	errorsList := make(map[string][]string)
-	status := true
-
-	if len(param.PhoneNumber) != 11 || param.PhoneNumber[:2] != "09" {
-		errorsList["errors"] = append(errorsList["errors"], "phone number must be 11 numbers and start with 09")
-		status = false
-	}
-
-	if len(param.OTPCode) != 6 {
-		errorsList["errors"] = append(errorsList["errors"], "OTP code must be 6 digit")
-		status = false
-	}
-
-	return status, errorsList
+func (a VerifyValidator) Verify(params *authparams.VerifyParam) error {
+	return validation.ValidateStruct(&params,
+		validation.Field(&params.PhoneNumber, validation.Required, validation.Match(regexp.MustCompile("^09(0[1-5]|1\\d|2[0-2]|3\\d|9\\d)\\d{6}$"))),
+		validation.Field(&params.OTPCode, validation.Required, validation.Length(6, 6)),
+	)
 }

@@ -1,0 +1,16 @@
+development:
+  dialect: mysql
+  datasource: ${APP_MYSQL_USER}:${APP_MYSQL_PASSWORD}@tcp(${APP_MYSQL_HOST}:${APP_MYSQL_PORT})/${APP_MYSQL_DATABASE}?parseTime=true
+  dir: repository\mysql\migrations
+  table: migrations
+
+# put the configs in env of your system:
+
+# in windows OS:
+# setx APP_MYSQL_USER [your-db-user]
+# setx APP_MYSQL_PASSWORD [your-db-password]
+# setx APP_MYSQL_HOST [your-db-host]
+# setx APP_MYSQL_PORT [your-db-port]
+# setx APP_MYSQL_DATABASE [your-db-name]
+
+  

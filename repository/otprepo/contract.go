@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type OTPContract interface {
+type OTPRepoContract interface {
 	Set(ctx context.Context, key string, value int, ttl time.Duration) error
 	Get(ctx context.Context, key string) (string, error)
 	TTL(ctx context.Context, key string) (time.Duration, error)
