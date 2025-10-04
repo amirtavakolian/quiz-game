@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-		"github.com/amirtavakolian/quiz-game/param/authparams"
-"github.com/amirtavakolian/quiz-game/pkg/jwt"
+	"github.com/amirtavakolian/quiz-game/param/authparams"
+	"github.com/amirtavakolian/quiz-game/pkg/jwt"
 	"github.com/amirtavakolian/quiz-game/pkg/logger"
+	"github.com/amirtavakolian/quiz-game/pkg/notifier/sms"
 	"github.com/amirtavakolian/quiz-game/pkg/responser"
 	"github.com/amirtavakolian/quiz-game/repository/otprepo"
+	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
 	"github.com/amirtavakolian/quiz-game/validator/auth"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -23,34 +25,32 @@ const (
 )
 
 type Verify struct {
-	Validator     auth.VerifyValidator
+	Validator     auth.AuthValidator
+	playerRepo    repositorycontracts.PlayerRepoContract
 	Responser     responser.Response
-	OTPRepository otprepo.OTPContract
+	Notifier      sms.SMSNotifier
+	OTPRepository otprepo.OTPRepoContract
+	Logger        logger.Logger
 	JWTService    *jwt.JWTService
-	LoggerSvc     logger.Logger
 }
 
-func NewVerifyService(validator auth.VerifyValidator,
-	responser responser.Response,
-	otpRepo otprepo.OTPContract,
-	jwtService *jwt.JWTService,
-	loggerSvc logger.Logger,
-) Verify {
+func NewVerifyService(playerRepo repositorycontracts.PlayerRepoContract, jwt *jwt.JWTService) Verify {
 	return Verify{
-		Validator:     validator,
-		Responser:     responser,
-		OTPRepository: otpRepo,
-		JWTService:    jwtService,
-		LoggerSvc:     loggerSvc,
+		Validator:     auth.NewAuthValidator(),
+		playerRepo:    playerRepo,
+		Responser:     responser.NewResponse(),
+		Notifier:      sms.NewNotifier(),
+		OTPRepository: otprepo.NewRedisOTPRepo(),
+		Logger:        logger.New(),
+		JWTService:    jwt,
 	}
 }
 
-func (s Verify) Verify(verifyParam authparams.VerifyParam) responser.Response {
+func (s Verify) Verify(verifyParam *authparams.VerifyParam) responser.Response {
 	ctx := context.Background()
-	status, validationErrors := s.Validator.Validate(verifyParam)
 
-	if !status {
-		return s.Responser.SetData(validationErrors).SetStatusCode(400).Build()
+	if err := s.Validator.Verify(verifyParam); err != nil {
+		return s.Responser.SetData(err.Error()).SetStatusCode(400).Build()
 	}
 
 	OTPFailedAttemptsKey := OTPFailedAttempts + verifyParam.PhoneNumber
@@ -75,19 +75,18 @@ func (s Verify) Verify(verifyParam authparams.VerifyParam) responser.Response {
 		if ttl != "" {
 			response = response.SetData(map[string]string{"ttl": ttl})
 		}
-
 		return response.Build()
 	}
 
 	token, err := s.JWTService.GenerateToken()
 	if err != nil {
-		s.LoggerSvc.Log().Error("generate token", zap.Error(err), zap.String("generate-token", err.Error()))
+		s.Logger.Log().Error("generate token", zap.Error(err), zap.String("generate-token", err.Error()))
 		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
 	}
 
 	_, err = s.OTPRepository.Del(ctx, OTPFailedAttemptsKey, OTPGeneratedCodeKey+verifyParam.PhoneNumber)
 	if err != nil {
-		s.LoggerSvc.Log().Error("delete key from redis", zap.Error(err), zap.String("delete-key", err.Error()))
+		s.Logger.Log().Error("delete key from redis", zap.Error(err), zap.String("delete-key", err.Error()))
 		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
 	}
 
@@ -99,10 +98,10 @@ func (s Verify) checkOTPAttemptsLimit(ctx context.Context, OTPFailedAttemptsKey 
 
 	if err != redis.Nil {
 		if OTPFailedAttemptsCount == MaxWrongOTPAttempt {
-			ttl, ttlErr := s.OTPRepository.TTL(ctx, OTPFailedAttemptsKey)
+			ttl, err := s.OTPRepository.TTL(ctx, OTPFailedAttemptsKey)
 
-			if ttlErr != nil {
-				s.LoggerSvc.Log().Error("redis ttl lookup failed", zap.Error(ttlErr))
+			if err != nil {
+				s.Logger.Log().Error("redis ttl lookup failed", zap.Error(err))
 				return errors.New("internal server error")
 			}
 
