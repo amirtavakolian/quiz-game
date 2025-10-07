@@ -34,3 +34,21 @@ func (auth AuthHandler) Authenticate(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, result)
 }
+
+func (auth AuthHandler) Verify(c echo.Context) error {
+	var verifyParams authparams.VerifyParam
+	var result responser.Response
+
+	if err := c.Bind(&verifyParams); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	fx.New(
+		Modules,
+		fx.Invoke(func(s authservice.Authenticate) {
+			result = s.Verify(verifyParams)
+		}),
+	)
+
+	return c.JSON(http.StatusOK, result)
+}
