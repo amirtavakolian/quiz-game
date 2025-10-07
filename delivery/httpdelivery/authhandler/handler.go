@@ -2,11 +2,10 @@ package authhandler
 
 import (
 	"github.com/amirtavakolian/quiz-game/param/authparams"
-	"github.com/amirtavakolian/quiz-game/repository"
-	"github.com/amirtavakolian/quiz-game/repository/mysql/playerrepo"
-	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
+	"github.com/amirtavakolian/quiz-game/pkg/responser"
 	"github.com/amirtavakolian/quiz-game/service/authservice"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/fx"
 	"net/http"
 )
 
@@ -20,15 +19,18 @@ func NewAuthHandler(e *echo.Echo) AuthHandler {
 
 func (auth AuthHandler) Authenticate(c echo.Context) error {
 	var params authparams.RegisterParam
-	var playerrepository repositorycontracts.PlayerRepoContract
-
-	playerrepository = playerrepo.NewPlayerRepo(repository.NewMysqlConnection())
-	authSvc := authservice.NewAuthService(playerrepository)
+	var result responser.Response
 
 	if err := c.Bind(&params); err != nil {
-		// logg error
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	result := authSvc.Authenticate(params)
+	fx.New(
+		Modules,
+		fx.Invoke(func(s authservice.Authenticate) {
+			result = s.Authenticate(params)
+		}),
+	)
+
 	return c.JSON(http.StatusOK, result)
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/amirtavakolian/quiz-game/pkg/notifier/sms"
 	responser "github.com/amirtavakolian/quiz-game/pkg/responser"
 	"github.com/amirtavakolian/quiz-game/repository/otprepo"
-	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
 	"github.com/amirtavakolian/quiz-game/validator/auth"
 	"go.uber.org/zap"
 	"net/http"
@@ -16,22 +15,26 @@ import (
 )
 
 type Authenticate struct {
-	Validator     auth.AuthValidator
-	playerRepo    repositorycontracts.PlayerRepoContract
+	Validator auth.AuthValidator
 	Responser     responser.Response
 	Notifier      sms.SMSNotifier
 	OTPRepository otprepo.OTPRepoContract
 	Logger        logger.Logger
 }
 
-func NewAuthService(playerRepo repositorycontracts.PlayerRepoContract) Authenticate {
+func NewAuthService(
+	validator auth.AuthValidator,
+	responser responser.Response,
+	notifier sms.SMSNotifier,
+	otpRepo otprepo.RedisOTPRepo,
+	logger logger.Logger,
+) Authenticate {
 	return Authenticate{
-		Validator:     auth.NewAuthValidator(),
-		playerRepo:    playerRepo,
-		Responser:     responser.NewResponse(),
-		Notifier:      sms.NewNotifier(),
-		OTPRepository: otprepo.NewRedisOTPRepo(),
-		Logger:        logger.New(),
+		Validator: validator,
+		Responser:     responser,
+		Notifier:      notifier,
+		OTPRepository: otpRepo,
+		Logger:        logger,
 	}
 }
 
