@@ -2,34 +2,26 @@ package auth
 
 import (
 	"github.com/amirtavakolian/quiz-game/param/authparams"
-
+	validation "github.com/go-ozzo/ozzo-validation"
+	"regexp"
 )
 
 type AuthValidator struct {
 }
 
-func NewUserValidator() AuthValidator {
+func NewAuthValidator() AuthValidator {
 	return AuthValidator{}
 }
 
-func (u AuthValidator) RegisterUserValidate(param authparams.RegisterParam) (bool, map[string][]string) {
-	errorsList := make(map[string][]string)
-	status := true
+func (a AuthValidator) Authenticate(params authparams.RegisterParam) error {
+	return validation.ValidateStruct(&params,
+		validation.Field(&params.PhoneNumber, validation.Required, validation.Match(regexp.MustCompile(`^09\d{9}$`))),
+	)
+}
 
-	if len(param.Name) < 3 {
-		errorsList["errors"] = append(errorsList["errors"], "name must be more then 3 charecters")
-		status = false
-	}
-
-	if len(param.Family) < 3 {
-		errorsList["errors"] = append(errorsList["errors"], "firstname must be more then 3 characters")
-		status = false
-	}
-
-	if len(param.PhoneNumber) != 11 || param.PhoneNumber[:2] != "09" {
-		errorsList["errors"] = append(errorsList["errors"], "phone number must be 11 numbers and start with 09")
-		status = false
-	}
-
-	return status, errorsList
+func (a AuthValidator) Verify(params authparams.VerifyParam) error {
+	return validation.ValidateStruct(&params,
+		validation.Field(&params.PhoneNumber, validation.Required, validation.Match(regexp.MustCompile(`^09\d{9}$`))),
+		validation.Field(&params.OTPCode, validation.Required, validation.Length(6, 6)),
+	)
 }
