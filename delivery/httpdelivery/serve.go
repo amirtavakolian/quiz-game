@@ -6,15 +6,24 @@ import (
 )
 
 type Serve struct {
+	e       *echo.Echo
+	authHld authhandler.AuthHandler
+}
+
+func NewServe(e *echo.Echo, authHld authhandler.AuthHandler) Serve {
+	return Serve{
+		e:       e,
+		authHld: authHld,
+	}
 }
 
 func (s Serve) Serve() {
-	e := echo.New()
-	LoadRoutes(e)
-	e.Logger.Fatal(e.Start(":8080"))
+	s.loadRoutes()
+	s.e.Logger.Fatal(s.e.Start(":8080"))
 }
 
-func LoadRoutes(e *echo.Echo) {
-	authHld := authhandler.NewAuthHandler(e)
-	authHld.AddRoutes()
+func (s Serve) loadRoutes() {
+	routeGroup := s.e.Group("/authenticate")
+	routeGroup.POST("/auth", s.authHld.Authenticate)
+	routeGroup.POST("/verify", s.authHld.Verify)
 }

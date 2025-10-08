@@ -5,16 +5,17 @@ import (
 	"github.com/amirtavakolian/quiz-game/pkg/responser"
 	"github.com/amirtavakolian/quiz-game/service/authservice"
 	"github.com/labstack/echo/v4"
-	"go.uber.org/fx"
 	"net/http"
 )
 
 type AuthHandler struct {
-	e *echo.Echo
+	AuthService authservice.Authenticate
 }
 
-func NewAuthHandler(e *echo.Echo) AuthHandler {
-	return AuthHandler{e: e}
+func NewAuthHandler(authService authservice.Authenticate) AuthHandler {
+	return AuthHandler{
+		AuthService: authService,
+	}
 }
 
 func (auth AuthHandler) Authenticate(c echo.Context) error {
@@ -25,13 +26,7 @@ func (auth AuthHandler) Authenticate(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	fx.New(
-		Modules,
-		fx.Invoke(func(s authservice.Authenticate) {
-			result = s.Authenticate(params)
-		}),
-	)
-
+	result = auth.AuthService.Authenticate(params)
 	return c.JSON(http.StatusOK, result)
 }
 
@@ -43,12 +38,6 @@ func (auth AuthHandler) Verify(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	fx.New(
-		Modules,
-		fx.Invoke(func(s authservice.Authenticate) {
-			result = s.Verify(verifyParams)
-		}),
-	)
-
+	result = auth.AuthService.Verify(verifyParams)
 	return c.JSON(http.StatusOK, result)
 }

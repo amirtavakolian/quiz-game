@@ -155,7 +155,7 @@ func (s Authenticate) checkOTPAttemptsLimit(ctx context.Context, OTPFailedAttemp
 				return errors.New("internal server error")
 			}
 
-			msg := fmt.Sprintf("You have entered the code incorrectly 5 times. Please try again after %s.", ttl.String())
+			msg := fmt.Sprintf("You have entered the code incorrectly 5 times. Please try again after %s", ttl.String())
 			return errors.New(msg)
 		}
 	}

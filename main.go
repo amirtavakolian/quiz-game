@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/amirtavakolian/quiz-game/delivery/httpdelivery"
 	"github.com/joho/godotenv"
+	"go.uber.org/fx"
 	"log"
 )
 
@@ -13,6 +13,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	serve := httpdelivery.Serve{}
-	serve.Serve()
+	fx.New(
+		Modules,
+	).Run()
 }
