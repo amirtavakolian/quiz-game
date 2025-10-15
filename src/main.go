@@ -14,8 +14,10 @@ import (
 	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
 	"github.com/amirtavakolian/quiz-game/service/authservice"
 	"github.com/amirtavakolian/quiz-game/validator/auth"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
+	"log"
 )
 
 var Modules = fx.Module(
@@ -44,3 +46,15 @@ var Modules = fx.Module(
 		s.Serve()
 	}),
 )
+
+func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	fx.New(
+		Modules,
+	).Run()
+}
