@@ -19,7 +19,7 @@ func NewServe(e *echo.Echo, authHld authhandler.AuthHandler) Serve {
 
 func (s Serve) Serve() {
 	s.loadRoutes()
-	s.e.Logger.Fatal(s.e.Start(":8080"))
+	s.e.Logger.Fatal(s.e.Start(":80"))
 }
 
 func (s Serve) loadRoutes() {

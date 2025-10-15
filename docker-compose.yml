@@ -1,0 +1,61 @@
+services:
+  database:
+    image: mysql:latest
+    restart: always
+    volumes: 
+      - quizgame-mysql-vol:/var/lib/mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: quiz-game
+    ports: 
+      - 3306:3306
+    networks: 
+      - quizgame-network
+  
+  redis:
+    image: redis:latest
+    restart: always
+    volumes: 
+      - quizgame-redis-vol:/data
+    container_name: redis
+    ports:
+      - 8020:6379
+    networks:
+      - quizgame-network
+
+  quiz-game:
+    build: .
+    container_name: quizgame_app
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./src:/src
+      - go-mod-cache:/go/pkg/mod  
+    networks:
+      - quizgame-network
+    depends_on:
+      - database
+      - redis
+    environment:
+       APP_MYSQL_DATABASE: quiz-game
+       APP_MYSQL_PASSWORD: 123
+       APP_MYSQL_USER: root
+       APP_MYSQL_HOST: database
+       APP_MYSQL_PORT: 3306
+
+networks:
+  quizgame-network:
+    driver: bridge
+  
+volumes:
+  quizgame-mysql-vol:
+    driver: "local"
+    name: "quizgame-mysql-vol"
+  quizgame-redis-vol:
+    driver: "local"
+    name: "quizgame-redis-vol"
+  go-mod-cache:
+    driver: "local"
+    name: "go-mod-cache1"
