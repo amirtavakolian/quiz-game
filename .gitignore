@@ -1,4 +1,5 @@
 *.xml
 *.iml
-.env
+src/.env
 .idea
+.swp
