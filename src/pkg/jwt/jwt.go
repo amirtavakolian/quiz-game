@@ -10,18 +10,26 @@ type JWTService struct {
 	secretKey []byte
 }
 
+type JwtClaims struct {
+	PhoneNumber string `json:"phone_number"`
+	jwt.RegisteredClaims
+}
+
 func NewJwtService(secretKey []byte) *JWTService {
 	return &JWTService{secretKey: secretKey}
 }
 
-func (jwtSvc JWTService) GenerateToken() (string, error) {
+func (jwtSvc JWTService) GenerateToken(phonenumber string) (string, error) {
 	if len(jwtSvc.secretKey) == 0 {
 		return "", errors.New("jwt secret key is empty")
 	}
 
-	claims := jwt.RegisteredClaims{
-		Subject:   "Access-Token",
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+	claims := JwtClaims{
+		PhoneNumber: phonenumber,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+			Subject:   "Access-Token",
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

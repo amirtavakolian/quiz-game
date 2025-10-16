@@ -124,7 +124,7 @@ func (s Authenticate) Verify(verifyParam authparams.VerifyParam) responser.Respo
 		return response.Build()
 	}
 
-	token, err := s.JWTService.GenerateToken()
+	token, err := s.JWTService.GenerateToken(verifyParam.PhoneNumber)
 	if err != nil {
 		s.Logger.Log().Error("generate token", zap.Error(err), zap.String("generate-token", err.Error()))
 		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
