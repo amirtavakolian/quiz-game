@@ -10,6 +10,6 @@ func (s Serve) loadRoutes() {
 	authRouteGroup.POST("/auth", s.authHld.Authenticate)
 	authRouteGroup.POST("/verify", s.authHld.Verify)
 
-	profileRouteGroup := s.e.Group("/profile", echojwt.JWT(os.Getenv("JWT_SECRET_KEY")))
-	profileRouteGroup.POST("/store", s.profileHld.Store)
+	profileRouteGroup := s.e.Group("/profile", echojwt.JWT([]byte(os.Getenv("JWT_SECRET_KEY"))))
+	profileRouteGroup.POST("/update", s.profileHld.Update)
 }

@@ -10,15 +10,17 @@ import (
 	"github.com/amirtavakolian/quiz-game/pkg/responser"
 	"github.com/amirtavakolian/quiz-game/repository"
 	"github.com/amirtavakolian/quiz-game/repository/mysql/playerrepo"
+	"github.com/amirtavakolian/quiz-game/repository/mysql/profilerepo"
 	"github.com/amirtavakolian/quiz-game/repository/otprepo"
 	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
 	"github.com/amirtavakolian/quiz-game/service/authservice"
+	"github.com/amirtavakolian/quiz-game/service/profileservice"
 	"github.com/amirtavakolian/quiz-game/validator/auth"
+	profilevalidator "github.com/amirtavakolian/quiz-game/validator/profile"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 	"log"
-	"os"
 )
 
 var Modules = fx.Module(
@@ -32,16 +34,13 @@ var Modules = fx.Module(
 	fx.Provide(logger.New),
 	fx.Provide(authhandler.NewAuthHandler),
 	fx.Provide(authservice.NewAuthService),
-	fx.Provide(func() []byte {
-		return []byte(os.Getenv("JWT_SECRET_KEY"))
-	}),
 	fx.Provide(jwt.NewJwtService),
 	fx.Provide(func() *echo.Echo { return echo.New() }),
 	fx.Provide(httpdelivery.NewServe),
-	fx.Provide(fx.Annotate(
-		playerrepo.NewPlayerRepo,
-		fx.As(new(repositorycontracts.PlayerRepoContract)),
-	)),
+	fx.Provide(fx.Annotate(playerrepo.NewPlayerRepo, fx.As(new(repositorycontracts.PlayerRepoContract)))),
+	fx.Provide(profilevalidator.NewProfileValidator),
+	fx.Provide(profilerepo.NewProfileRepo),
+	fx.Provide(profileservice.NewProfileService),
 	fx.Invoke(func(s httpdelivery.Serve) {
 		s.Serve()
 	}),
