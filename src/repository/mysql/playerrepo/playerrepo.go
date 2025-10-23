@@ -12,10 +12,18 @@ func NewPlayerRepo(connection *sql.DB) Player {
 	return Player{connection: connection}
 }
 
-func (p Player) Store(phoneNumber string) error {
-	if _, err := p.connection.Exec("INSERT IGNORE INTO players (phone_number) VALUES (?)", phoneNumber); err != nil {
-		return err
+func (p Player) Store(phoneNumber string) (int64, error) {
+	result, err := p.connection.Exec("INSERT IGNORE INTO players (phone_number) VALUES (?)", phoneNumber)
+
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	id, err := result.LastInsertId()
+
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

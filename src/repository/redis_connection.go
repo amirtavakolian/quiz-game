@@ -2,19 +2,22 @@ package repository
 
 import (
 	"context"
-	"github.com/amirtavakolian/quiz-game/pkg/configloader"
+	"fmt"
 	"github.com/redis/go-redis/v9"
+	"os"
+	"strconv"
 )
 
 func NewRedisConnection(ctx context.Context) *redis.Client {
-
-	cfgLoader := configloader.NewConfigLoader()
-	k := cfgLoader.SetPrefix("APP_").SetDivider("_").SetDelimiter(".").Build()
-
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     k.String("redis.host") + ":" + k.String("redis.port"),
-		Password: k.String("redis.password"),
-		DB:       k.Int("redis.db"),
+		Addr: func() string {
+			return fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+		}(),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB: func() int {
+			num, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
+			return num
+		}(),
 	})
 
 	if err := rdb.Ping(ctx).Err(); err != nil {

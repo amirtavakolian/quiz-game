@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/amirtavakolian/quiz-game/delivery/httpdelivery"
 	"github.com/amirtavakolian/quiz-game/delivery/httpdelivery/authhandler"
-	"github.com/amirtavakolian/quiz-game/pkg/configloader"
+	"github.com/amirtavakolian/quiz-game/delivery/httpdelivery/profilehandler"
 	"github.com/amirtavakolian/quiz-game/pkg/jwt"
 	"github.com/amirtavakolian/quiz-game/pkg/logger"
 	"github.com/amirtavakolian/quiz-game/pkg/notifier/sms"
@@ -18,6 +18,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 	"log"
+	"os"
 )
 
 var Modules = fx.Module(
@@ -25,15 +26,14 @@ var Modules = fx.Module(
 	fx.Provide(repository.NewMysqlConnection),
 	fx.Provide(auth.NewAuthValidator),
 	fx.Provide(responser.NewResponse),
+	fx.Provide(profilehandler.NewProfileHandler),
 	fx.Provide(sms.NewNotifier),
 	fx.Provide(otprepo.NewRedisOTPRepo),
 	fx.Provide(logger.New),
 	fx.Provide(authhandler.NewAuthHandler),
 	fx.Provide(authservice.NewAuthService),
 	fx.Provide(func() []byte {
-		cfgLoader := configloader.NewConfigLoader()
-		result := cfgLoader.SetPrefix("APP_").SetDelimiter(".").SetDivider("_").Build()
-		return []byte(result.String("jwt.secret.key"))
+		return []byte(os.Getenv("JWT_SECRET_KEY"))
 	}),
 	fx.Provide(jwt.NewJwtService),
 	fx.Provide(func() *echo.Echo { return echo.New() }),

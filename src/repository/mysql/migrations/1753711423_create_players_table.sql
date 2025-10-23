@@ -1,8 +1,4 @@
 -- +migrate Up
-CREATE DATABASE IF NOT EXISTS `quiz-game`
-CHARACTER SET utf8mb3
-COLLATE utf8mb3_persian_ci;
-
 CREATE TABLE `players`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `firstname` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_persian_ci NULL,

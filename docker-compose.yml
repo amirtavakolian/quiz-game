@@ -38,12 +38,9 @@ services:
     depends_on:
       - database
       - redis
-    environment:
-       APP_MYSQL_DATABASE: quiz-game
-       APP_MYSQL_PASSWORD: 123
-       APP_MYSQL_USER: root
-       APP_MYSQL_HOST: database
-       APP_MYSQL_PORT: 3306
+    env_file:
+      - /src/.env
+
 
 networks:
   quizgame-network:
