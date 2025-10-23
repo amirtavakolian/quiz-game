@@ -41,7 +41,6 @@ services:
     env_file:
       - /src/.env
 
-
 networks:
   quizgame-network:
     driver: bridge
