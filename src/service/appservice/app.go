@@ -17,8 +17,7 @@ func NewAppService(configLoader *configloader.ConfigLoader) AppService {
 func (app AppService) GetSmsProvider() (string, string) {
 	yamlConfigPath, _ := os.Getwd()
 
-	cfgLoader := app.ConfigLoader.SetDelimiter(".").SetYamlpath(filepath.Join(yamlConfigPath, "config", "app.yaml")).
-		SetPrefix("APP_").SetDivider("_").Build()
+	cfgLoader := app.ConfigLoader.SetDelimiter(".").SetYamlpath(filepath.Join(yamlConfigPath, "config", "app.yaml")).Build()
 
-	return cfgLoader.String("sms-provider"), cfgLoader.String("kavenegar.api")
+	return cfgLoader.String("sms-provider"), os.Getenv("KAVENEGAR_API")
 }

@@ -1,6 +1,6 @@
 package entity
 
-type User struct {
+type Player struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Family      string `json:"family"`

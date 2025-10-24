@@ -3,24 +3,22 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-"github.com/amirtavakolian/quiz-game/pkg/configloader"
-	_ "github.com/go-sql-driver/mysql"
+	"os"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func NewMysqlConnection() *sql.DB {
-	cfgLoader := configloader.NewConfigLoader()
-	dbConfig := cfgLoader.SetPrefix("APP_").SetDelimiter(".").SetDivider("_").Build()
-
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-		dbConfig.String("mysql.user"),
-		dbConfig.String("mysql.password"),
-		dbConfig.String("mysql.host"),
-		dbConfig.String("mysql.port"),
-		dbConfig.String("mysql.database"),
+		os.Getenv("MYSQL_USER"),
+		os.Getenv("MYSQL_PASSWORD"),
+		os.Getenv("MYSQL_HOST"),
+		os.Getenv("MYSQL_PORT"),
+		os.Getenv("MYSQL_DATABASE"),
 	)
 
-	db, err := sql.Open(dbConfig.String("mysql.dialect"), dsn)
+	db, err := sql.Open(os.Getenv("MYSQL_DIALECT"), dsn)
 	if err != nil {
 		panic(err)
 	}
@@ -35,4 +33,3 @@ func NewMysqlConnection() *sql.DB {
 
 	return db
 }
-

@@ -1,5 +1,5 @@
 package repositorycontracts
 
 type PlayerRepoContract interface {
-	Store(phoneNumber string) error
+	Store(phoneNumber string) (int64, error)
 }

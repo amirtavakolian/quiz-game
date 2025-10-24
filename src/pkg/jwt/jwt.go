@@ -2,26 +2,39 @@ package jwt
 
 import (
 	"errors"
-	"github.com/golang-jwt/jwt/v5"
+	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type JWTService struct {
 	secretKey []byte
 }
 
-func NewJwtService(secretKey []byte) *JWTService {
-	return &JWTService{secretKey: secretKey}
+type JwtClaims struct {
+	PhoneNumber string `json:"phone_number"`
+	PlayerID    int64  `json:"player_id"`
+		jwt.RegisteredClaims
 }
 
-func (jwtSvc JWTService) GenerateToken() (string, error) {
+func NewJwtService() *JWTService {
+	key := os.Getenv("JWT_SECRET_KEY")
+	return &JWTService{secretKey: []byte(key)}
+}
+
+func (jwtSvc JWTService) GenerateToken(phonenumber string, playerID int64) (string, error) {
 	if len(jwtSvc.secretKey) == 0 {
 		return "", errors.New("jwt secret key is empty")
 	}
 
-	claims := jwt.RegisteredClaims{
-		Subject:   "Access-Token",
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+	claims := JwtClaims{
+		PhoneNumber: phonenumber,
+		PlayerID:    playerID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(100 * time.Hour)),
+			Subject:   "Access-Token",
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

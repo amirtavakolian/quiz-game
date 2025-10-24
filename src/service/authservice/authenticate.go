@@ -124,7 +124,14 @@ func (s Authenticate) Verify(verifyParam authparams.VerifyParam) responser.Respo
 		return response.Build()
 	}
 
-	token, err := s.JWTService.GenerateToken()
+	playerID, err := s.PlayerRepo.Store(verifyParam.PhoneNumber)
+
+	if err != nil {
+		s.Logger.Log().Error("database error", zap.Error(err), zap.String("insert-phone", err.Error()))
+		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
+	}
+
+	token, err := s.JWTService.GenerateToken(verifyParam.PhoneNumber, playerID)
 	if err != nil {
 		s.Logger.Log().Error("generate token", zap.Error(err), zap.String("generate-token", err.Error()))
 		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
@@ -132,11 +139,6 @@ func (s Authenticate) Verify(verifyParam authparams.VerifyParam) responser.Respo
 
 	if _, err = s.OTPRepository.Del(ctx, OTPFailedAttemptsKey, OTPGeneratedCodeKey+verifyParam.PhoneNumber); err != nil {
 		s.Logger.Log().Error("delete key from redis", zap.Error(err), zap.String("delete-key", err.Error()))
-		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
-	}
-
-	if err = s.PlayerRepo.Store(verifyParam.PhoneNumber); err != nil {
-		s.Logger.Log().Error("database error", zap.Error(err), zap.String("insert-phone", err.Error()))
 		return s.Responser.SetMessage("internal server error").SetStatusCode(500).Build()
 	}
 
