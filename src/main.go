@@ -11,8 +11,9 @@ import (
 	"github.com/amirtavakolian/quiz-game/pkg/notifier/sms"
 	"github.com/amirtavakolian/quiz-game/pkg/responser"
 	"github.com/amirtavakolian/quiz-game/repository"
-	"github.com/amirtavakolian/quiz-game/repository/mysql/playerrepo"
-	"github.com/amirtavakolian/quiz-game/repository/mysql/profilerepo"
+	"github.com/amirtavakolian/quiz-game/repository/gorm/gormplayerrepo"
+	"github.com/amirtavakolian/quiz-game/repository/gorm/gormprofilerepo"
+	"github.com/amirtavakolian/quiz-game/repository/mysql/mysqlprofilerepo"
 	"github.com/amirtavakolian/quiz-game/repository/otprepo"
 	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
 	"github.com/amirtavakolian/quiz-game/service/authservice"
@@ -27,6 +28,7 @@ import (
 var Modules = fx.Module(
 	"serve",
 	fx.Provide(repository.NewMysqlConnection),
+	fx.Provide(repository.NewGormConnection),
 	fx.Provide(auth.NewAuthValidator),
 	fx.Provide(responser.NewResponse),
 	fx.Provide(profilehandler.NewProfileHandler),
@@ -38,9 +40,10 @@ var Modules = fx.Module(
 	fx.Provide(jwt.NewJwtService),
 	fx.Provide(func() *echo.Echo { return echo.New() }),
 	fx.Provide(httpdelivery.NewServe),
-	fx.Provide(fx.Annotate(playerrepo.NewPlayerRepo, fx.As(new(repositorycontracts.PlayerRepoContract)))),
+	fx.Provide(fx.Annotate(gormplayerrepo.NewPlayerRepo, fx.As(new(repositorycontracts.PlayerRepoContract)))),
+	fx.Provide(fx.Annotate(gormprofilerepo.NewProfileRepo, fx.As(new(repositorycontracts.ProfileRepoContract)))),
 	fx.Provide(profilevalidator.NewProfileValidator),
-	fx.Provide(profilerepo.NewProfileRepo),
+	fx.Provide(mysqlprofilerepo.NewProfileRepo),
 	fx.Provide(profileservice.NewProfileService),
 	fx.Invoke(func(s httpdelivery.Serve) {
 		s.Serve()

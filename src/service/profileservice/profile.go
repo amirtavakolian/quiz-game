@@ -4,9 +4,9 @@ import (
 	"github.com/amirtavakolian/quiz-game/param/profileparams"
 	"github.com/amirtavakolian/quiz-game/pkg/logger"
 	"github.com/amirtavakolian/quiz-game/pkg/responser"
-	"github.com/amirtavakolian/quiz-game/repository/mysql/profilerepo"
+	"github.com/amirtavakolian/quiz-game/repository/repositorycontracts"
 	profilevalidator "github.com/amirtavakolian/quiz-game/validator/profile"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"net/http"
@@ -16,14 +16,14 @@ type Profile struct {
 	Responser        responser.Response
 	Logger           logger.Logger
 	ProfileValidator profilevalidator.Profile
-	ProfileRepo      profilerepo.Profile
+	ProfileRepo      repositorycontracts.ProfileRepoContract
 }
 
 func NewProfileService(
 	responser responser.Response,
 	logger logger.Logger,
 	profileValidator profilevalidator.Profile,
-	profileRepo profilerepo.Profile,
+	profileRepo repositorycontracts.ProfileRepoContract,
 ) Profile {
 	return Profile{
 		Responser:        responser,

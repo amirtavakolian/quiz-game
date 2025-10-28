@@ -1,4 +1,4 @@
-package profilerepo
+package mysqlprofilerepo
 
 import (
 	"database/sql"
